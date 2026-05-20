@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADO Smoke Scout</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 12l2 2 4-4"/>
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1 class="app-title">ADO Test Plan Helper</h1>
+        <span class="app-subtitle">ADO Test Plan Utility</span>
+      </div>
+      <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">
+        <svg class="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg class="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Step 1: Export -->
+    <section class="section">
+      <div class="section-header">
+        <span class="step-badge">01</span>
+        <h2 class="section-title">Export Test Cases</h2>
+      </div>
+      <p class="section-desc">Reads all visible test cases from the open Azure DevOps Test Suite page and downloads them as JSON.</p>
+      <button class="btn btn-primary" id="exportBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Export Test Cases
+      </button>
+    </section>
+
+    <div class="divider">
+      <span>then analyze externally with AI</span>
+    </div>
+
+    <!-- AI Prompt Hint -->
+    <details class="prompt-hint">
+      <summary>View AI prompt template</summary>
+      <div class="prompt-body">
+        <pre id="promptText">You are a senior QA engineer. Select test cases suitable for Smoke Testing.
+
+Rules:
+- Validate core business functionality
+- Focus on happy path scenarios
+- Exclude edge cases and negative tests
+- Exclude cosmetic UI and boundary tests
+
+Return ONLY a JSON array of test case IDs:
+[10452, 10470, 10501]</pre>
+        <button class="btn-copy" id="copyPromptBtn">Copy prompt</button>
+      </div>
+    </details>
+
+    <!-- Step 2: Apply IDs -->
+    <section class="section">
+      <div class="section-header">
+        <span class="step-badge">02</span>
+        <h2 class="section-title">Apply Smoke IDs</h2>
+      </div>
+      <p class="section-desc">Paste the AI-returned IDs or upload a JSON file. The extension will highlight matching test cases in the UI.</p>
+
+      <div class="input-group">
+        <label class="input-label" for="idsInput">Paste IDs (comma-separated or JSON array)</label>
+        <textarea
+          id="idsInput"
+          class="textarea"
+          placeholder="[10452, 10470, 10501]&#10;or&#10;10452, 10470, 10501"
+          rows="4"
+        ></textarea>
+      </div>
+
+      <div class="upload-row">
+        <label class="btn btn-ghost" for="fileInput">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Upload JSON
+          <input type="file" id="fileInput" accept=".json" style="display:none" />
+        </label>
+        <button class="btn btn-accent" id="applyBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Apply Smoke IDs
+        </button>
+      </div>
+    </section>
+
+    <!-- Log Output -->
+    <div class="log-panel" id="logPanel">
+      <div class="log-header">
+        <span>Activity Log</span>
+        <button class="log-clear" id="clearLogBtn">Clear</button>
+      </div>
+      <div class="log-body" id="logBody">
+        <div class="log-entry log-info">Ready. Open an Azure DevOps Test Suite page to begin.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="utils.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
