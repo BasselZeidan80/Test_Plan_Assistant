@@ -195,7 +195,7 @@ async function applyIds(ids) {
 }
 
 // ─────────────────────────────────────────────
-// 🔥 FIX: SELECT CHECKBOX (YOUR DOM BASED)
+//  FIX: SELECT CHECKBOX (YOUR DOM BASED)
 // ─────────────────────────────────────────────
 
 async function selectCheckbox(row) {
@@ -222,7 +222,7 @@ async function selectCheckbox(row) {
 
   await sleep(60);
 
-  // 🔥 real pointer simulation
+  //  real pointer simulation
   const events = [
     new MouseEvent('pointerdown', { bubbles: true }),
     new MouseEvent('mousedown', { bubbles: true }),

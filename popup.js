@@ -1,12 +1,3 @@
-/**
- * popup.js — ADO Smoke Scout popup controller
- *
- * Orchestrates:
- *  - Export Test Cases → sends message to content.js → downloads JSON
- *  - Apply Smoke IDs   → parses IDs from textarea/file → sends to content.js
- *  - Dark/light theme toggle
- *  - Activity log
- */
 
 // ─── DOM References ───────────────────────────────────────────────────────────
 const exportBtn     = document.getElementById('exportBtn');
