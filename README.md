@@ -1,4 +1,4 @@
-# ADO Smoke Scout — Chrome Extension
+# ADO Test Plan Helper — Chrome Extension
 
 A lightweight Chrome Extension for Azure DevOps Test Plans that helps QA teams identify and apply Smoke Test or any action need  candidates using an AI-assisted external workflow.
 

@@ -20,8 +20,22 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 // FEATURE 1: EXTRACT
 // ─────────────────────────────────────────────
 
+ function getSuiteId() {
+
+  const url = new URL(window.location.href);
+
+  return (
+    url.searchParams.get('suiteId') ||
+    url.searchParams.get('suite') ||
+    ''
+  );
+}
+
+
 async function extractTestCases() {
+
   const suiteName = getSuiteName();
+  const suiteId = getSuiteId();
 
   await scrollToLoadAllRows();
 
@@ -33,11 +47,13 @@ async function extractTestCases() {
 
   return {
     suiteName,
+    suiteId,
     exportedAt: new Date().toISOString(),
     totalCount: testCases.length,
     testCases
   };
 }
+
 
 function getSuiteName() {
   const selectors = [
@@ -56,23 +72,50 @@ function getSuiteName() {
   return document.title;
 }
 
-function findTestCaseRows() {
-  const selectors = [
-    '[role="treegrid"] [role="row"]',
-    '[role="grid"] [role="row"]',
-    '[data-row-index]',
-    'tr[data-id]'
+function getTestCaseGrid() {
+
+  const grids = [
+    ...document.querySelectorAll(
+      '[role="grid"], [role="treegrid"]'
+    )
   ];
 
-  for (const sel of selectors) {
-    const rows = Array.from(document.querySelectorAll(sel))
-      .filter(r => getRowId(r) !== null);
+  return grids.find(grid => {
 
-    if (rows.length) return rows;
+    const headers = [
+      ...grid.querySelectorAll(
+        '[role="columnheader"]'
+      )
+    ].map(h => h.textContent.trim());
+
+    return headers.includes('Test Case Id');
+  });
+}
+
+ 
+
+
+function findTestCaseRows() {
+
+  const grids = [
+    ...document.querySelectorAll(
+      '[role="grid"], [role="treegrid"]'
+    )
+  ];
+
+  const grid = grids[2];
+
+  if (!grid) {
+    return [];
   }
 
-  return [];
+  return [
+    ...grid.querySelectorAll('[role="row"]')
+  ].filter(row =>
+    row.querySelector('[role="gridcell"], td')
+  );
 }
+
 
 function getRowId(row) {
   if (row.dataset.id) {
@@ -92,45 +135,51 @@ function getRowId(row) {
 
   return null;
 }
+ 
 
 function extractRowData(row) {
-  const id = getRowId(row);
-  if (!id) return null;
 
-  const cells = [...row.querySelectorAll('[role="gridcell"], td')];
-  const texts = cells.map(c => c.textContent.trim());
+  const cells = [
+    ...row.querySelectorAll(
+      '[role="gridcell"], td'
+    )
+  ];
+
+  if (cells.length < 10) {
+    return null;
+  }
+
+  const title =
+    cells[2]?.textContent.trim() || '';
+
+  const id =
+    parseInt(
+      cells[5]?.textContent.trim(),
+      10
+    );
+
+  const tags =
+    (cells[8]?.textContent || '')
+      .split(';')
+      .map(t => t.trim())
+      .filter(Boolean);
+
+  const priority =
+    cells[9]?.textContent.trim() || '';
+
+  if (!id) {
+    return null;
+  }
 
   return {
     id,
-    title: getTitle(row, texts),
-    priority: getPriority(row, texts),
-    tags: getTags(row)
+    title,
+    tags,
+    priority
   };
 }
 
-function getTitle(row, texts) {
-  const el = row.querySelector('[class*="title"], a[href*="workitems"]');
-  if (el?.textContent.trim()) return el.textContent.trim();
-
-  return texts.find(t => t.length > 3 && !/^\d+$/.test(t)) || '';
-}
-
-function getPriority(row, texts) {
-  const el = row.querySelector('[aria-label*="Priority" i]');
-  if (el) {
-    const m = el.getAttribute('aria-label')?.match(/:\s*(.+)/);
-    if (m) return m[1].trim();
-  }
-
-  return texts.find(t =>
-    /^(1|2|3|4|high|medium|low|critical)$/i.test(t)
-  ) || '';
-}
-
-function getTags(row) {
-  const tags = row.querySelectorAll('[class*="tag"], [class*="badge"]');
-  return [...tags].map(t => t.textContent.trim()).filter(Boolean);
-}
+ 
 
 async function scrollToLoadAllRows() {
   const container = document.querySelector('[role="grid"], [role="treegrid"]');
